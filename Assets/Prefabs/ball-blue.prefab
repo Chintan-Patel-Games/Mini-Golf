@@ -143,7 +143,7 @@ MeshCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &5938774650720137399
@@ -376,15 +376,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
       propertyPath: m_LocalScale.z
-      value: 2
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
       propertyPath: m_LocalPosition.x
@@ -392,7 +392,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.105
+      value: 0.1275
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
       propertyPath: m_LocalPosition.z
@@ -530,9 +530,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c53e352299b09847bf433648ab82392, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startPosition: {fileID: 7249365300260788219}
   lineRenderer: {fileID: 2539433625312632632}
-  MaxForce: 25
-  forceModifier: 1.5
+  MaxForce: 20
+  dragSensitivity: 10
+  forceModifier: 1
   areaAffector: {fileID: 5938774650720137399}
   rayLayer:
     serializedVersion: 2

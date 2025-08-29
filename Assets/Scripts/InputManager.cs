@@ -59,6 +59,11 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void GetDistance()
     {
+        if (Camera.main == null)
+        {
+            Debug.LogWarning("Camera not found!");
+            return;
+        }
         //we create a plane whose mid point is at ball position and whose normal is toward Camera
         var plane = new Plane(Camera.main.transform.forward, BallController.instance.transform.position);
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);    //create a ray

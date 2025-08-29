@@ -1,48 +1,54 @@
 using UnityEngine;
 
-/// <summary>
-/// Script which controls the ball
-/// </summary>
 [RequireComponent(typeof(Rigidbody))]
 public class BallController : MonoBehaviour
 {
     public static BallController instance;
+    private Vector3 lastSafePosition;
+    private Quaternion lastSafeRotation;
 
+    [SerializeField] private Transform startPosition;       // assign empty GameObject at start of level
     [SerializeField] private LineRenderer lineRenderer;     //reference to lineRenderer child object
-    [SerializeField] private float MaxForce;                //maximum force that an be applied to ball
+    [SerializeField] private float MaxForce = 100f;         //maximum force that an be applied to ball
+    [SerializeField] private float dragSensitivity = 20f;    // how much drag translates to power
     [SerializeField] private float forceModifier = 0.5f;    //multipliers of force
     [SerializeField] private GameObject areaAffector;       //reference to sprite object which show area around ball to click
     [SerializeField] private LayerMask rayLayer;            //layer allowed to be detected by ray
 
     private float force;                                    //actuale force which is applied to the ball
     private Rigidbody rgBody;                               //reference to rigidbody attached to this gameobject
-    /// <summary>
-    /// The below variables are used to decide the force to be applied to the ball
-    /// </summary>
     private Vector3 startPos, endPos;
-    private bool canShoot = false, ballIsStatic = true;    //bool to make shooting stopping ball easy
+    private bool canShoot = false, ballIsStatic = true;     //bool to make shooting stopping ball easy
     private Vector3 direction;                              //direction in which the ball will be shot
+
+    public int CurrentPower { get; private set; }
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        if (instance == null) instance = this;
+        else Destroy(gameObject);
 
-        rgBody = GetComponent<Rigidbody>();                 //get reference to the rigidbody
+        rgBody = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
+    private void Start()
+    {
+        // Set initial safe position
+        lastSafePosition = startPosition.position;
+        lastSafeRotation = startPosition.rotation;
+
+        // Optional: move ball to start
+        transform.position = lastSafePosition;
+        transform.rotation = lastSafeRotation;
+    }
+
     void Update()
     {
         if (rgBody.velocity == Vector3.zero && !ballIsStatic)   //if velocity is zero and ballIsStatic is false
         {
-            ballIsStatic = true;                                //set ballIsStatic to true
+            ballIsStatic = true;
+            lastSafePosition = transform.position;
+            lastSafeRotation = transform.rotation;                            //set ballIsStatic to true
             //LevelManager.instance.ShotTaken();                  //inform LevelManager of shot taken
             rgBody.angularVelocity = Vector3.zero;              //set angular velocity to zero
             areaAffector.SetActive(true);                       //activate areaAffector
@@ -65,17 +71,19 @@ public class BallController : MonoBehaviour
     }
 
     // Unity native Method to detect colliding objects
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if (other.name == "Destroyer")                              //if the object name is Destroyer
-    //    {
-    //        LevelManager.instance.LevelFailed();                    //Level Failed
-    //    }
-    //    else if (other.name == "Hole")                              //if the object name is Hole
-    //    {
-    //        LevelManager.instance.LevelComplete();                  //Level Complete
-    //    }
-    //}
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "Destroyer")                              //if the object name is Destroyer
+        {
+            ResetBall();
+            //LevelManager.instance.LevelFailed();                    //Level Failed
+        }
+        else if (other.name == "Hole")                              //if the object name is Hole
+        {
+            Debug.Log("Level Completed");
+            //LevelManager.instance.LevelComplete();                  //Level Complete
+        }
+    }
 
     public void MouseDownMethod()                                           //method called on mouse down by InputManager
     {
@@ -88,8 +96,10 @@ public class BallController : MonoBehaviour
     public void MouseNormalMethod()                                         //method called by InputManager
     {
         if (!ballIsStatic) return;                                           //no mouse detection if ball is moving
-        endPos = ClickedPoint();                                                //get the vector in word space
-        force = Mathf.Clamp(Vector3.Distance(endPos, startPos) * forceModifier, 0, MaxForce);   //calculate the force
+        endPos = ClickedPoint();
+        float dragDistance = Vector3.Distance(endPos, startPos);            // Calculate raw drag distance
+        force = Mathf.Clamp(dragDistance * dragSensitivity, 0, MaxForce);   //calculate the force
+        CurrentPower = Mathf.RoundToInt((force / MaxForce) * 100f);          // Convert to 0–100 scale
         //UIManager.instance.PowerBar.fillAmount = force / MaxForce;              //set the powerBar image fill amount
         //we convert the endPos to local pos for ball as lineRenderer is child of ball
         lineRenderer.SetPosition(1, transform.InverseTransformPoint(endPos));   //set its 1st position
@@ -102,29 +112,29 @@ public class BallController : MonoBehaviour
         lineRenderer.gameObject.SetActive(false);                           //deactive lineRenderer
     }
 
-    /// <summary>
-    /// Method used to convert the mouse position to the world position in respect to Level
-    /// </summary>
-    Vector3 ClickedPoint()
+    private Vector3 ClickedPoint()
     {
         Vector3 position = Vector3.zero;                                //get a new Vector3 varialbe
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);    //create a ray from camera in mouseposition direction
         RaycastHit hit = new RaycastHit();                              //create a RaycastHit
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, rayLayer))    //check for the hit 
-        {
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, rayLayer))    //check for the hit
             position = hit.point;                                       //save the hit point in position
-        }
         return position;                                                //return position
     }
 
-#if UNITY_EDITOR
+    private void ResetBall()
+    {
+        rgBody.velocity = Vector3.zero;
+        rgBody.angularVelocity = Vector3.zero;
+        transform.position = lastSafePosition;
+        transform.rotation = lastSafeRotation;
+    }
 
+#if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, 1.5f);
     }
-
 #endif
-
 }

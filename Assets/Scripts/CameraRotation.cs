@@ -11,7 +11,7 @@ public class CameraRotation : MonoBehaviour
 
     private float currentAngle = 0f;
     private Vector3 initialOffset;
-    private CinemachineFramingTransposer transposer;
+    private CinemachineTransposer transposer;
 
     private void Awake()
     {
@@ -20,10 +20,10 @@ public class CameraRotation : MonoBehaviour
 
     private void Start()
     {
-        transposer = vcam.GetCinemachineComponent<CinemachineFramingTransposer>();
+        transposer = vcam.GetCinemachineComponent<CinemachineTransposer>();
 
         // Save the original offset (this includes height!)
-        initialOffset = transposer.m_TrackedObjectOffset;
+        initialOffset = transposer.m_FollowOffset;
 
         // Ensure vcam is set up to follow & look at the target
         vcam.Follow = target;
@@ -38,6 +38,6 @@ public class CameraRotation : MonoBehaviour
         Vector3 rotatedOffset = Quaternion.Euler(0, currentAngle, 0) * new Vector3(initialOffset.x, 0, initialOffset.z);
         rotatedOffset.y = initialOffset.y;
 
-        transposer.m_TrackedObjectOffset = rotatedOffset;
+        transposer.m_FollowOffset = rotatedOffset;
     }
 }
