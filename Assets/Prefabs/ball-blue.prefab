@@ -376,15 +376,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.5
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.5
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.5
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
       propertyPath: m_LocalPosition.x
@@ -499,9 +499,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8057287146486500673}
   serializedVersion: 4
-  m_Mass: 0.5
-  m_Drag: 1
-  m_AngularDrag: 5
+  m_Mass: 1
+  m_Drag: 1.25
+  m_AngularDrag: 7.5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -532,9 +532,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPosition: {fileID: 7249365300260788219}
   lineRenderer: {fileID: 2539433625312632632}
-  MaxForce: 20
+  MaxForce: 10
   dragSensitivity: 10
-  forceModifier: 1
   areaAffector: {fileID: 5938774650720137399}
   rayLayer:
     serializedVersion: 2
