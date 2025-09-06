@@ -1,9 +1,11 @@
+using DG.Tweening;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class BallController : MonoBehaviour
 {
-    public static BallController Instance;
+    public static BallController Instance { get; private set; }
+    public int CurrentPower { get; private set; }
 
     [SerializeField] private Transform startPosition;       //assign empty GameObject at start of level
     [SerializeField] private LineRenderer lineRenderer;     //reference to lineRenderer child object
@@ -19,8 +21,6 @@ public class BallController : MonoBehaviour
     private Vector3 startPos, endPos;
     private bool canShoot = false, ballIsStatic = true;     //bool to make shooting stopping ball easy
     private Vector3 direction;                              //direction in which the ball will be shot
-
-    public int CurrentPower { get; private set; }
 
     private void Awake()
     {
@@ -41,14 +41,13 @@ public class BallController : MonoBehaviour
         transform.rotation = lastSafeRotation;
     }
 
-    void Update()
+    private void Update()
     {
         if (rgBody.velocity == Vector3.zero && !ballIsStatic)   //if velocity is zero and ballIsStatic is false
         {
             ballIsStatic = true;
             lastSafePosition = transform.position;
             lastSafeRotation = transform.rotation;
-            //LevelManager.instance.ShotTaken();                  //inform LevelManager of shot taken
             rgBody.angularVelocity = Vector3.zero;              //set angular velocity to zero
             areaAffector.SetActive(true);                       //activate areaAffector
             GameStateManager.Instance.ChangeState(GameState.PlayerInput);
@@ -57,18 +56,17 @@ public class BallController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (canShoot)                                               //if canSHoot is true
-        {
-            canShoot = false;                                       //set canShoot to false
-            ballIsStatic = false;                                   //set ballIsStatic to false
-            GameStateManager.Instance.ChangeState(GameState.BallMoving);
-            direction = startPos - endPos;                          //get the direction between 2 vectors from start to end pos
-            rgBody.AddForce(direction * force, ForceMode.Impulse);  //add force to the ball in given direction
-            areaAffector.SetActive(false);                          //deactivate areaAffector
-            //UIManager.instance.PowerBar.fillAmount = 0;             //reset the powerBar to zero
-            force = 0;                                              //reset the force to zero
-            startPos = endPos = Vector3.zero;                       //reset the vectors to zero
-        }
+        if (!canShoot) return;
+
+        canShoot = false;                                       //set canShoot to false
+        ballIsStatic = false;                                   //set ballIsStatic to false
+        GameStateManager.Instance.ChangeState(GameState.BallMoving);
+        direction = startPos - endPos;                          //get the direction between 2 vectors from start to end pos
+        rgBody.AddForce(direction * force, ForceMode.Impulse);  //add force to the ball in given direction
+        areaAffector.SetActive(false);                          //deactivate areaAffector
+        //UIManager.instance.PowerBar.fillAmount = 0;             //reset the powerBar to zero
+        force = 0;                                              //reset the force to zero
+        startPos = endPos = Vector3.zero;                       //reset the vectors to zero
     }
 
     // Unity native Method to detect colliding objects

@@ -25,22 +25,15 @@ public class LevelManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else
-            Destroy(gameObject);
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
     #region Level Setup
     public void StartLevelSetup(Action onComplete)
     {
         LoadLevel(currentLevelIndex);
-
-        // Animate rise and spawn ball
-        AnimateLevelRise(() =>
-        {
-            onComplete?.Invoke();
-        });
+        AnimateLevelRise(onComplete);  // Animate rise and spawn ball
     }
 
     private void LoadLevel(int index)
@@ -92,13 +85,13 @@ public class LevelManager : MonoBehaviour
         currentBallInstance = Instantiate(ballPrefab, startPoint.position, startPoint.rotation);
         currentBallInstance.transform.localScale = Vector3.zero;
 
-        currentBallInstance.transform.DOScale(Vector3.one, 0.5f)
+        // Set vcam target immediately
+        CameraManager.Instance.SetTarget(currentBallInstance.transform, preserveWorldPosition: true, tweenToDefaultOffset: true);
+
+        currentBallInstance.transform
+            .DOScale(Vector3.one, 0.5f)
             .SetEase(Ease.OutBack)
-            .OnComplete(() =>
-            {
-                CameraManager.Instance.SetTarget(currentBallInstance.transform);
-                onComplete?.Invoke();
-            });
+            .OnComplete(() => onComplete?.Invoke() );
     }
     #endregion
 
@@ -116,25 +109,12 @@ public class LevelManager : MonoBehaviour
         {
             CameraManager.Instance.MoveVcamTo(() =>
             {
-                // Load next level after camera animation completes
                 currentLevelIndex++;
-                if (currentLevelIndex >= levels.Length) currentLevelIndex = 0; // reset to level 1
+                if (currentLevelIndex >= levels.Length) currentLevelIndex = 0;
 
                 StartLevelSetup(onComplete);
             });
         });
     }
     #endregion
-
-    //public void ResetLevel()
-    //{
-    //    currentLevelIndex = 0;
-
-    //    LoadLevel(currentLevelIndex);
-
-    //    AnimateLevelAndSpawnBall(() =>
-    //    {
-    //        GameStateManager.Instance.ChangeState(GameState.PlayerInput);
-    //    });
-    //}
 }
