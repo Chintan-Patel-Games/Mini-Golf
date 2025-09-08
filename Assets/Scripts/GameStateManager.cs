@@ -23,6 +23,10 @@ public class GameStateManager : MonoBehaviour
 
         switch (newState)
         {
+            case GameState.MainMenu:
+                //UIController.Instance.ShowMainMenuUI();
+                break;
+
             case GameState.LevelSetup:
                 // Setup/animate level and spawn ball
                 LevelManager.Instance.StartLevelSetup(() =>
