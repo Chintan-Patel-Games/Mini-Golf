@@ -1,21 +1,11 @@
-using UnityEngine;
+using MiniGolf.Main;
+using MiniGolf.UI;
 
-public class GameStateManager : MonoBehaviour
+public class GameStateManager
 {
-    public static GameStateManager Instance;
-
     public GameState CurrentState { get; private set; }
 
-    private void Awake()
-    {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
-    }
-
-    private void Start()
-    {
-        ChangeState(GameState.LevelSetup); // Kick off flow
-    }
+    public void Initialize() => ChangeState(GameState.MainMenu);
 
     public void ChangeState(GameState newState)
     {
@@ -24,10 +14,11 @@ public class GameStateManager : MonoBehaviour
         switch (newState)
         {
             case GameState.MainMenu:
-                //UIController.Instance.ShowMainMenuUI();
+                GameService.Instance.UIService.ShowUI(UIType.MainMenu);
                 break;
 
             case GameState.LevelSetup:
+                GameService.Instance.UIService.ShowUI(UIType.Gameplay);
                 // Setup/animate level and spawn ball
                 LevelManager.Instance.StartLevelSetup(() =>
                 {
@@ -37,20 +28,27 @@ public class GameStateManager : MonoBehaviour
 
             case GameState.PlayerInput:
                 // Enable input
-                InputManager.Instance.EnableBallInput(true);
-                InputManager.Instance.EnableCameraInput(true);
+                GameService.Instance.InputService.EnableBallInput(true);
+                GameService.Instance.InputService.EnableCameraInput(true);
                 break;
 
             case GameState.BallMoving:
                 // Disable input and start monitoring ball
-                InputManager.Instance.EnableBallInput(false);
+                GameService.Instance.InputService.EnableBallInput(false);
+                break;
+
+            case GameState.Paused:
+                // Show pause UI and disable input
+                GameService.Instance.InputService.EnableBallInput(false);
+                GameService.Instance.InputService.EnableCameraInput(false);
+                GameService.Instance.UIService.ShowUI(UIType.Pause);
                 break;
 
             case GameState.LevelComplete:
                 // Show UI or transition to next level
                 //UIManager.Instance.ShowLevelComplete();
-                InputManager.Instance.EnableBallInput(false);
-                InputManager.Instance.EnableCameraInput(false);
+                GameService.Instance.InputService.EnableBallInput(false);
+                GameService.Instance.InputService.EnableCameraInput(false);
                 LevelManager.Instance.LevelComplete(() =>
                 {
                     ChangeState(GameState.PlayerInput);

@@ -1,9 +1,10 @@
-using DG.Tweening;
+using MiniGolf.Main;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class BallController : MonoBehaviour
 {
+    #region Properties
     public static BallController Instance { get; private set; }
     public int CurrentPower { get; private set; }
 
@@ -21,7 +22,9 @@ public class BallController : MonoBehaviour
     private Vector3 startPos, endPos;
     private bool canShoot = false, ballIsStatic = true;     //bool to make shooting stopping ball easy
     private Vector3 direction;                              //direction in which the ball will be shot
+    #endregion
 
+    #region Lifecycle methods
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -50,7 +53,7 @@ public class BallController : MonoBehaviour
             lastSafeRotation = transform.rotation;
             rgBody.angularVelocity = Vector3.zero;              //set angular velocity to zero
             areaAffector.SetActive(true);                       //activate areaAffector
-            GameStateManager.Instance.ChangeState(GameState.PlayerInput);
+            GameService.Instance.GameStateManager.ChangeState(GameState.PlayerInput);
         }
     }
 
@@ -60,7 +63,7 @@ public class BallController : MonoBehaviour
 
         canShoot = false;                                       //set canShoot to false
         ballIsStatic = false;                                   //set ballIsStatic to false
-        GameStateManager.Instance.ChangeState(GameState.BallMoving);
+        GameService.Instance.GameStateManager.ChangeState(GameState.BallMoving);
         direction = startPos - endPos;                          //get the direction between 2 vectors from start to end pos
         rgBody.AddForce(direction * force, ForceMode.Impulse);  //add force to the ball in given direction
         areaAffector.SetActive(false);                          //deactivate areaAffector
@@ -75,9 +78,11 @@ public class BallController : MonoBehaviour
         if (other.name == "Destroyer")     //if the object name is Destroyer
             ResetBall();
         else if (other.name == "Hole")     //if the object name is Hole
-            GameStateManager.Instance.ChangeState(GameState.LevelComplete);
+            GameService.Instance.GameStateManager.ChangeState(GameState.LevelComplete);
     }
+    #endregion
 
+    #region Input Methods
     public void MouseDownMethod()                                           //method called on mouse down by InputManager
     {
         if (!ballIsStatic) return;                                          //no mouse detection if ball is moving
@@ -126,6 +131,7 @@ public class BallController : MonoBehaviour
             position = hit.point;                                       //save the hit point in position
         return position;                                                //return position
     }
+    #endregion
 
     private void ResetBall()
     {

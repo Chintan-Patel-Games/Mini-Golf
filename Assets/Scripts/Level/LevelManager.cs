@@ -71,15 +71,6 @@ public class LevelManager : MonoBehaviour
             });
     }
 
-    private void AnimateLevelFall(Action onComplete)
-    {
-        Vector3 targetPos = currentLevelInstance.transform.position - Vector3.up * platformRiseDistance;
-
-        currentLevelInstance.transform.DOMoveY(targetPos.y, platformFallDuration)
-            .SetEase(Ease.InCubic)
-            .OnComplete(() => onComplete?.Invoke());
-    }
-
     private void SpawnBallWithPop(Action onComplete)
     {
         currentBallInstance = Instantiate(ballPrefab, startPoint.position, startPoint.rotation);
@@ -92,6 +83,15 @@ public class LevelManager : MonoBehaviour
             .DOScale(Vector3.one, 0.5f)
             .SetEase(Ease.OutBack)
             .OnComplete(() => onComplete?.Invoke() );
+    }
+
+    private void AnimateLevelFall(Action onComplete)
+    {
+        Vector3 targetPos = currentLevelInstance.transform.position - Vector3.up * platformRiseDistance;
+
+        currentLevelInstance.transform.DOMoveY(targetPos.y, platformFallDuration)
+            .SetEase(Ease.InCubic)
+            .OnComplete(() => onComplete?.Invoke());
     }
     #endregion
 
@@ -117,4 +117,6 @@ public class LevelManager : MonoBehaviour
         });
     }
     #endregion
+
+    public BallController BallController => currentBallInstance != null ? currentBallInstance.GetComponent<BallController>() : null;
 }
