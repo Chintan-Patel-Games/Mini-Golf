@@ -1,4 +1,4 @@
-namespace MiniGolf.UI
+namespace MiniGolf.UI.BaseUI
 {
     /// <summary>
     /// Base class for all UI controllers in the game.

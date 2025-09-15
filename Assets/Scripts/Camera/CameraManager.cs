@@ -1,11 +1,11 @@
 using Cinemachine;
 using DG.Tweening;
+using MiniGolf.Utilities;
 using UnityEngine;
 
-public class CameraManager : MonoBehaviour
+public class CameraManager : GenericMonoSingleton<CameraManager>
 {
-    public static CameraManager Instance;
-
+    #region Variables
     [SerializeField] private CinemachineVirtualCamera vcam;
     [SerializeField] private float rotationSpeed = 5f;
     [SerializeField] private float moveDuration = 1f;  // Duration for camera animations
@@ -16,11 +16,12 @@ public class CameraManager : MonoBehaviour
 
     private Vector3 defaultPosition;
     private Quaternion defaultRotation;
+    #endregion
 
-    private void Awake()
+    #region Unity Methods
+    protected override void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        base.Awake();
 
         // Save the position/rotation you set in Unity
         defaultPosition = vcam.transform.position;
@@ -31,12 +32,13 @@ public class CameraManager : MonoBehaviour
     {
         transposer = vcam.GetCinemachineComponent<CinemachineTransposer>();
         initialOffset = transposer.m_FollowOffset;  // Save the original offset
-
-        // Always follow the singleton ball
-        if (BallController.Instance != null)
-            SetTarget(BallController.Instance.transform);
     }
+    #endregion
 
+    #region Camera Control
+    /// <summary>
+    /// Rotate camera around target based on mouse X input.
+    /// </summary>
     public void RotateCamera(float mouseX)
     {
         currentAngle += mouseX * rotationSpeed;
@@ -48,6 +50,9 @@ public class CameraManager : MonoBehaviour
         transposer.m_FollowOffset = rotated;
     }
 
+    /// <summary>
+    /// Set a new target for the vcam to follow/look at, with optional offset tween.
+    /// </summary>
     public void SetTarget(Transform newTarget, bool preserveWorldPosition = true, bool tweenToDefaultOffset = true)
     {
         if (newTarget == null) { vcam.Follow = null; vcam.LookAt = null; return; }
@@ -56,7 +61,7 @@ public class CameraManager : MonoBehaviour
         Vector3 camPos = vcam.transform.position;
         Vector3 tgtPos = newTarget.position;
 
-        if (preserveWorldPosition)
+        if (preserveWorldPosition)  // Preserve world offset if requested
         {
             Vector3 offset;
             switch (transposer.m_BindingMode)
@@ -84,6 +89,7 @@ public class CameraManager : MonoBehaviour
         initialOffset = transposer.m_FollowOffset;
         currentAngle = 0f;  // reset the input rotation accumulator
 
+        // Smoothly tween back to baseline offset
         if (tweenToDefaultOffset)
         {
             DOTween.Kill("CM_OffsetTween");
@@ -95,7 +101,9 @@ public class CameraManager : MonoBehaviour
             ).SetEase(Ease.InOutSine).SetId("CM_OffsetTween");
         }
     }
+    #endregion
 
+    #region Camera Animation
     /// <summary>
     /// Animate the vcam transform to a target position and rotation
     /// </summary>
@@ -105,4 +113,5 @@ public class CameraManager : MonoBehaviour
         vcam.transform.DORotateQuaternion(defaultRotation, moveDuration).SetEase(Ease.InOutSine)
             .OnComplete(() => onComplete?.Invoke());
     }
+    #endregion
 }

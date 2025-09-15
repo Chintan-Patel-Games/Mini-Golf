@@ -1,7 +1,6 @@
 using MiniGolf.UI.GameplayUI;
 using MiniGolf.UI.MainMenuUI;
 using MiniGolf.UI.PauseUI;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MiniGolf.UI

@@ -19,8 +19,7 @@ public class GameStateManager
 
             case GameState.LevelSetup:
                 GameService.Instance.UIService.ShowUI(UIType.Gameplay);
-                // Setup/animate level and spawn ball
-                LevelManager.Instance.StartLevelSetup(() =>
+                GameService.Instance.LevelService.StartLevel(() =>
                 {
                     ChangeState(GameState.PlayerInput);
                 });
@@ -35,6 +34,7 @@ public class GameStateManager
             case GameState.BallMoving:
                 // Disable input and start monitoring ball
                 GameService.Instance.InputService.EnableBallInput(false);
+                GameService.Instance.InputService.EnableCameraInput(true);
                 break;
 
             case GameState.Paused:
@@ -46,10 +46,9 @@ public class GameStateManager
 
             case GameState.LevelComplete:
                 // Show UI or transition to next level
-                //UIManager.Instance.ShowLevelComplete();
                 GameService.Instance.InputService.EnableBallInput(false);
                 GameService.Instance.InputService.EnableCameraInput(false);
-                LevelManager.Instance.LevelComplete(() =>
+                GameService.Instance.LevelService.CompleteLevel(() =>
                 {
                     ChangeState(GameState.PlayerInput);
                 });

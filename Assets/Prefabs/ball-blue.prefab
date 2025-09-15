@@ -458,7 +458,7 @@ PrefabInstance:
       addedObject: {fileID: 3055622246719866787}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4767589276465570635}
+      addedObject: {fileID: 7485056479556015940}
   m_SourcePrefab: {fileID: 100100000, guid: 69a802a4ea6f9294eba9b6536458eaee, type: 3}
 --- !u!4 &7249365300260788219 stripped
 Transform:
@@ -518,7 +518,7 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 80
   m_CollisionDetection: 2
---- !u!114 &4767589276465570635
+--- !u!114 &7485056479556015940
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -527,14 +527,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8057287146486500673}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c53e352299b09847bf433648ab82392, type: 3}
+  m_Script: {fileID: 11500000, guid: 4a4263adcb929d64aa38b3857727ac43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   startPosition: {fileID: 7249365300260788219}
   lineRenderer: {fileID: 2539433625312632632}
-  MaxForce: 10
-  dragSensitivity: 10
   areaAffector: {fileID: 5938774650720137399}
-  rayLayer:
-    serializedVersion: 2
-    m_Bits: 256

@@ -11,27 +11,27 @@ namespace MiniGolf.InputSystem
         /// <summary>
         /// Calculates distance between the mouse click position and the ball.
         /// </summary>
-        public void GetDistanceToBall()
+        public void GetDistanceToBall(Vector3? ballPosition)
         {
             if (Camera.main == null) return;
 
-            var plane = new Plane(Camera.main.transform.forward, BallController.Instance.transform.position);
+            var plane = new Plane(Camera.main.transform.forward, ballPosition.Value);
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             if (plane.Raycast(ray, out float dist))
             {
                 var clickWorldPos = ray.GetPoint(dist);
-                model.ClickDistance = Vector3.Distance(clickWorldPos, BallController.Instance.transform.position);
+                model.ClickDistance = Vector3.Distance(clickWorldPos, ballPosition.Value);
             }
         }
 
-        public void OnMouseDown(float clickDistance)
+        public void StartDrag(float clickDistance)
         {
             model.ClickDistance = clickDistance;
             model.CanRotate = true;
         }
 
-        public void OnMouseUp() => model.CanRotate = false;
+        public void EndDrag() => model.CanRotate = false;
 
         public bool IsBallClick() => model.ClickDistance <= model.ClickDistanceLimit && model.BallInputEnabled;
 

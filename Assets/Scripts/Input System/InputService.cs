@@ -1,4 +1,5 @@
 using MiniGolf.Main;
+using MiniGolf.UI;
 using UnityEngine;
 
 namespace MiniGolf.InputSystem
@@ -16,19 +17,29 @@ namespace MiniGolf.InputSystem
             EnableCameraInput(false);
         }
 
+        public void ProcessInput(Vector3? ballPosition)
+        {
+            if (!IsInputEnabled()) return;
+            if (ballPosition == null) return;
+
+            HandleMouseInput(ballPosition);
+            HandlePauseInput();
+        }
+
         /// <summary>
         /// Handles mouse input for ball and camera.
         /// </summary>
-        public void HandleMouseInput()
+        private void HandleMouseInput(Vector3? ballPosition)
         {
+            if (ballPosition == null) return; // No balls in the scene
+
             if (Input.GetMouseButtonDown(0) && !model.CanRotate)
             {
-                controller.GetDistanceToBall();
-                controller.OnMouseDown(model.ClickDistance);
+                controller.GetDistanceToBall(ballPosition);
+                controller.StartDrag(model.ClickDistance);
 
                 if (controller.IsBallClick())
-                    GameService.Instance.GetBallController().MouseDownMethod();
-                //  GameService.Instance.EventService.OnMouseDown.InvokeEvent();
+                    GameService.Instance.EventService.OnMouseDown.InvokeEvent();
             }
 
             if (model.CanRotate)
@@ -36,18 +47,16 @@ namespace MiniGolf.InputSystem
                 if (Input.GetMouseButton(0))
                 {
                     if (controller.IsBallClick())
-                        GameService.Instance.GetBallController().MouseNormalMethod();
-                    //  GameService.Instance.EventService.OnMouseNormal.InvokeEvent();
+                        GameService.Instance.EventService.OnMouseNormal.InvokeEvent();
                     else if (controller.IsCameraActive())
                         GameService.Instance.CameraManager.RotateCamera(Input.GetAxis("Mouse X"));
                 }
 
                 if (Input.GetMouseButtonUp(0))
                 {
-                    controller.OnMouseUp();
+                    controller.EndDrag();
                     if (controller.IsBallClick())
-                        GameService.Instance.GetBallController().MouseUpMethod();
-                    //  GameService.Instance.EventService.OnMouseUp.InvokeEvent();
+                        GameService.Instance.EventService.OnMouseUp.InvokeEvent();
                 }
             }
         }
@@ -55,22 +64,25 @@ namespace MiniGolf.InputSystem
         /// <summary>
         /// Handles Escape key for toggling pause.
         /// </summary>
-        public void HandlePauseInput()
+        private void HandlePauseInput()
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                if (GameService.Instance.GameStateManager.CurrentState == GameState.Paused)
-                    GameService.Instance.GameStateManager.ChangeState(GameState.PlayerInput); // Resume
-                else
+                if (GameService.Instance.GameStateManager.CurrentState != GameState.Paused)
+                {
                     GameService.Instance.GameStateManager.ChangeState(GameState.Paused);      // Pause
-                //  GameService.Instance.EventService.OnPause.InvokeEvent();
+                    GameService.Instance.UIService.ShowUI(UIType.Pause);
+                }
+                else
+                {
+                    GameService.Instance.GameStateManager.ChangeState(GameState.PlayerInput); // Resume
+                    GameService.Instance.UIService.ShowUI(UIType.Gameplay);
+                }
             }
         }
 
         public void EnableBallInput(bool enable) => controller.EnableBallInput(enable);
-
         public void EnableCameraInput(bool enable) => controller.EnableCameraInput(enable);
-
         public bool IsInputEnabled() => controller.IsInputEnabled();
     }
 }

@@ -1,7 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-namespace MiniGolf.UI
+namespace MiniGolf.UI.BaseUI
 {
     /// <summary>
     /// Base class for all UI views in the game.
@@ -14,6 +14,9 @@ namespace MiniGolf.UI
 
         public virtual void ShowUI()
         {
+            gameObject.SetActive(true);
+            canvasGroup.DOKill(); // stop any previous tweens
+            canvasGroup.alpha = 0f; // ensure starts from 0
             canvasGroup.DOFade(1f, fadeDuration);
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
@@ -21,9 +24,12 @@ namespace MiniGolf.UI
 
         public virtual void HideUI()
         {
-            canvasGroup.DOFade(0f, fadeDuration);
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
+
+            canvasGroup.DOKill(); // stop any previous tweens
+            canvasGroup.DOFade(0f, fadeDuration)
+                .OnComplete(() => gameObject.SetActive(false));
         }
     }
 }

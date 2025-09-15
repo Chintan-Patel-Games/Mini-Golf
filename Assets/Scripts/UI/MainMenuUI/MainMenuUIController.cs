@@ -1,3 +1,4 @@
+using MiniGolf.UI.BaseUI;
 using MiniGolf.Main;
 
 namespace MiniGolf.UI.MainMenuUI

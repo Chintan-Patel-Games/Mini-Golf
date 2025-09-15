@@ -1,5 +1,7 @@
+using MiniGolf.Ball;
 using MiniGolf.Event;
 using MiniGolf.InputSystem;
+using MiniGolf.Level;
 using MiniGolf.UI;
 using MiniGolf.Utilities;
 using UnityEngine;
@@ -12,15 +14,13 @@ namespace MiniGolf.Main
         //public SoundService SoundService { get; private set; }
         public GameStateManager GameStateManager { get; private set; }
         public EventService EventService { get; private set; }
-        public BallController BallController { get; private set; }
+        public LevelService LevelService { get; private set; }
+        public BallService BallService { get; private set; }
         public InputService InputService { get; private set; }
 
-        // Scene services
+        [Header("Scene Services")]
         [SerializeField] private CameraManager cameraManager;
         public CameraManager CameraManager => cameraManager;
-
-        [SerializeField] private LevelManager levelManager;
-        public LevelManager LevelManager => levelManager;
 
         [SerializeField] private UIService uiService;
         public UIService UIService => uiService;
@@ -31,10 +31,22 @@ namespace MiniGolf.Main
         //[SerializeField] private AudioSource sfxSource;
         //[SerializeField] private AudioSource bgMusicSource;
 
+        [Header("Level References")]
+        [SerializeField] private LevelSO[] levelPrefabs;
+        [SerializeField] private Transform levelParent;
+
+        [Header("Golf Ball References")]
+        [SerializeField] private GameObject ballPrefab;
+        public GameObject BallPrefab => ballPrefab;
+
+        [SerializeField] private BallSO ballModel;
+
         protected override void Awake()
         {
             base.Awake();
             EventService = new EventService();
+            LevelService = new LevelService(levelPrefabs, levelParent);
+            BallService = new BallService(ballModel);
             GameStateManager = new GameStateManager();
             InputService = new InputService();
             //SoundService = new SoundService(soundSO, sfxSource, bgMusicSource);
@@ -44,14 +56,11 @@ namespace MiniGolf.Main
 
         private void Update()
         {
-            if (InputService.IsInputEnabled())
-            {
-                InputService.HandleMouseInput();
-                InputService.HandlePauseInput();
-            }
+            InputService.ProcessInput(BallService.GetBallPosition());
+            BallService.TickUpdate();
         }
 
-        public BallController GetBallController() => levelManager.BallController;
+        private void FixedUpdate() => BallService.TickFixedUpdate();
 
         public void OnExitGame()
         {
