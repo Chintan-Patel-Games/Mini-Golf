@@ -34,13 +34,11 @@ namespace MiniGolf.InputSystem
         public void EndDrag() => model.CanRotate = false;
 
         public bool IsBallClick() => model.ClickDistance <= model.ClickDistanceLimit && model.BallInputEnabled;
-
         public bool IsCameraActive() => model.CameraInputEnabled;
+        public bool IsInputEnabled() => model.BallInputEnabled && model.CameraInputEnabled;
 
         public void EnableBallInput(bool enabled) => model.EnableBallInput(enabled);
-
         public void EnableCameraInput(bool enabled) => model.EnableCameraInput(enabled);
 
-        public bool IsInputEnabled() => model.BallInputEnabled && model.CameraInputEnabled;
     }
 }

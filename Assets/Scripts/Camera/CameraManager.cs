@@ -3,7 +3,7 @@ using DG.Tweening;
 using MiniGolf.Utilities;
 using UnityEngine;
 
-public class CameraManager : GenericMonoSingleton<CameraManager>
+public class CameraManager : MonoBehaviour
 {
     #region Variables
     [SerializeField] private CinemachineVirtualCamera vcam;
@@ -19,10 +19,8 @@ public class CameraManager : GenericMonoSingleton<CameraManager>
     #endregion
 
     #region Unity Methods
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
-
         // Save the position/rotation you set in Unity
         defaultPosition = vcam.transform.position;
         defaultRotation = vcam.transform.rotation;

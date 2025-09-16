@@ -42,22 +42,16 @@ namespace MiniGolf.InputSystem
                     GameService.Instance.EventService.OnMouseDown.InvokeEvent();
             }
 
-            if (model.CanRotate)
-            {
-                if (Input.GetMouseButton(0))
-                {
-                    if (controller.IsBallClick())
-                        GameService.Instance.EventService.OnMouseNormal.InvokeEvent();
-                    else if (controller.IsCameraActive())
-                        GameService.Instance.CameraManager.RotateCamera(Input.GetAxis("Mouse X"));
-                }
+            if (model.CanRotate && Input.GetMouseButton(0) && controller.IsBallClick() && controller.IsInputEnabled())
+                GameService.Instance.EventService.OnMouseNormal.InvokeEvent();
+            else if (model.CanRotate && Input.GetMouseButton(0) && controller.IsCameraActive())
+                GameService.Instance.CameraManager.RotateCamera(Input.GetAxis("Mouse X"));
 
-                if (Input.GetMouseButtonUp(0))
-                {
-                    controller.EndDrag();
-                    if (controller.IsBallClick())
-                        GameService.Instance.EventService.OnMouseUp.InvokeEvent();
-                }
+            if (model.CanRotate && Input.GetMouseButtonUp(0))
+            {
+                controller.EndDrag();
+                if (controller.IsBallClick())
+                    GameService.Instance.EventService.OnMouseUp.InvokeEvent();
             }
         }
 
@@ -66,18 +60,23 @@ namespace MiniGolf.InputSystem
         /// </summary>
         private void HandlePauseInput()
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (!Input.GetKeyDown(KeyCode.Escape)) return;
+
+            var uiService = GameService.Instance.UIService;
+
+            if (!uiService.IsPauseUIActive())
             {
-                if (GameService.Instance.GameStateManager.CurrentState != GameState.Paused)
-                {
-                    GameService.Instance.GameStateManager.ChangeState(GameState.Paused);      // Pause
-                    GameService.Instance.UIService.ShowUI(UIType.Pause);
-                }
-                else
-                {
-                    GameService.Instance.GameStateManager.ChangeState(GameState.PlayerInput); // Resume
-                    GameService.Instance.UIService.ShowUI(UIType.Gameplay);
-                }
+                // Show pause overlay and block input
+                uiService.ShowPauseUI();
+                EnableBallInput(false);
+                EnableCameraInput(false);
+            }
+            else
+            {
+                // Hide pause overlay and resume input
+                uiService.HidePauseUI();
+                EnableBallInput(true);
+                EnableCameraInput(true);
             }
         }
 

@@ -39,17 +39,8 @@ namespace MiniGolf.Ball
         }
 
         public bool HasBall() => ballView != null && controller != null;
-
-        public void TickUpdate()
-        {
-            if (HasBall()) controller?.TickUpdate();
-        }
-
-        public void TickFixedUpdate()
-        {
-            if (HasBall()) controller?.TickFixedUpdate();
-        }
-
+        public void TickUpdate() => controller?.TickUpdate();
+        public void TickFixedUpdate() => controller?.TickFixedUpdate();
         public Vector3? GetBallPosition() => ballView != null ? ballView.transform.position : (Vector3?)null;
     }
 }

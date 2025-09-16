@@ -5,5 +5,4 @@ public enum GameState
     PlayerInput,   // Player can aim and shoot
     BallMoving,    // Wait until ball stops rolling
     LevelComplete, // Show complete UI and load next level
-    Paused         // Pause the game
 }

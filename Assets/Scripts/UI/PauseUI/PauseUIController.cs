@@ -15,7 +15,22 @@ namespace MiniGolf.UI.PauseUI
             HideUI();
         }
 
-        public void OnRetryButton() => GameService.Instance.GameStateManager.ChangeState(GameState.LevelSetup);
-        public void OnHomeButton() => GameService.Instance.GameStateManager.ChangeState(GameState.MainMenu);
+        public bool IsActive() => view.gameObject.activeSelf;
+        
+        public void OnResetButton()
+        {
+            view.HideUI();
+            GameService.Instance.InputService.EnableBallInput(true);
+            GameService.Instance.InputService.EnableCameraInput(true);
+            GameService.Instance.GameStateManager.ResetLevel();
+        }
+
+        public void OnHomeButton()
+        {
+            view.HideUI();
+            GameService.Instance.InputService.EnableBallInput(false);
+            GameService.Instance.InputService.EnableCameraInput(false);
+            GameService.Instance.GameStateManager.Home();
+        }
     }
 }

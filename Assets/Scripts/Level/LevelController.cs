@@ -10,6 +10,8 @@ namespace MiniGolf.Level
         private LevelSO model;
         private LevelView view;
 
+        public LevelSO Model => model;
+
         public LevelController(LevelSO model, Transform parent)
         {
             this.model = model;
@@ -47,7 +49,7 @@ namespace MiniGolf.Level
             GameService.Instance.BallService.SpawnBall(start.position, start.rotation, ballController =>
             {
                 // Camera follows ball
-                CameraManager.Instance.SetTarget(ballController.View.transform, true, true);
+                GameService.Instance.CameraManager.SetTarget(ballController.View.transform, true, true);
 
                 // Spawn animation
                 var ballTransform = ballController.View.transform;

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Level2
   m_EditorClassIdentifier: 
   levelPrefab: {fileID: 2517762100746333764, guid: 693a5f30abcb2564f9197dfa20ceaf29, type: 3}
+  par: 5
   platformRiseDistance: 10
   platformRiseDuration: 1.2
   platformFallDuration: 0.8

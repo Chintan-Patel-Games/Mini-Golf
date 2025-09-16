@@ -23,13 +23,13 @@ namespace MiniGolf.UI.PauseUI
 
         private void SubscribeToButtonClicks()
         {
-            retryButton.onClick.AddListener(controller.OnRetryButton);
+            retryButton.onClick.AddListener(controller.OnResetButton);
             homeButton.onClick.AddListener(controller.OnHomeButton);
         }
 
         private void UnSubscribeFromButtonClicks()
         {
-            retryButton.onClick.RemoveListener(controller.OnRetryButton);
+            retryButton.onClick.RemoveListener(controller.OnResetButton);
             homeButton.onClick.RemoveListener(controller.OnHomeButton);
         }
 

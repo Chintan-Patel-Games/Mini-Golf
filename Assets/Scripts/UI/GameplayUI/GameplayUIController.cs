@@ -16,7 +16,13 @@ namespace MiniGolf.UI.GameplayUI
             HideUI();
         }
 
-        public void OnPauseButton() => GameService.Instance.GameStateManager.ChangeState(GameState.Paused);
+        public void OnPauseButton()
+        {
+            GameService.Instance.InputService.EnableBallInput(false);
+            GameService.Instance.InputService.EnableCameraInput(true);
+            GameService.Instance.UIService.ShowPauseUI();
+        }
+
         public void SetPar(int par) => ((GameplayUIView)view).SetPar(par);
         public void SetStrokes(int strokes) => ((GameplayUIView)view).SetStrokes(strokes);
         public void SetPower(float normalizedPower) => ((GameplayUIView)view).SetPower(Mathf.Clamp01(normalizedPower / 100f));

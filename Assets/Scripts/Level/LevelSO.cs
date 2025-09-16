@@ -7,6 +7,7 @@ namespace MiniGolf.Level
     {
         [Header("Level Settings")]
         public GameObject levelPrefab;
+        public int par = 0; // 0 means no par assigned
 
         [Header("Animation Settings")]
         public float platformRiseDistance = 10f;

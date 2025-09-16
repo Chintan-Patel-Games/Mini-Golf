@@ -37,13 +37,6 @@ public class GameStateManager
                 GameService.Instance.InputService.EnableCameraInput(true);
                 break;
 
-            case GameState.Paused:
-                // Show pause UI and disable input
-                GameService.Instance.InputService.EnableBallInput(false);
-                GameService.Instance.InputService.EnableCameraInput(false);
-                GameService.Instance.UIService.ShowUI(UIType.Pause);
-                break;
-
             case GameState.LevelComplete:
                 // Show UI or transition to next level
                 GameService.Instance.InputService.EnableBallInput(false);
@@ -54,5 +47,47 @@ public class GameStateManager
                 });
                 break;
         }
+    }
+
+    /// <summary>
+    /// Reset current level (retry).
+    /// Destroys ball, resets camera, plays fall animation, then reloads level.
+    /// </summary>
+    public void ResetLevel()
+    {
+        // Destroy ball if present
+        GameService.Instance.BallService.ClearBall();
+
+        // Play fall animation, then reload current level
+        GameService.Instance.LevelService.FallLevel(() =>
+        {
+            // Reset camera
+            GameService.Instance.CameraManager.MoveVcamTo(() =>
+            {
+                ChangeState(GameState.LevelSetup);
+            });
+        });
+    }
+
+    /// <summary>
+    /// Go back to main menu.
+    /// Clears everything, resets camera, shows Main Menu UI.
+    /// </summary>
+    public void Home()
+    {
+        // Destroy ball if present
+        GameService.Instance.BallService.ClearBall();
+
+
+        // Play fall animation, then reload current level
+        GameService.Instance.LevelService.FallLevel(() =>
+        {
+            // Reset camera, then show main menu
+            GameService.Instance.CameraManager.MoveVcamTo(() =>
+            {
+                GameService.Instance.LevelService.DestroyLevel();
+                ChangeState(GameState.MainMenu);
+            });
+        });
     }
 }

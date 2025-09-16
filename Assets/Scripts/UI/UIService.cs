@@ -49,6 +49,10 @@ namespace MiniGolf.UI
             }
         }
 
+        public void ShowPauseUI() => pauseUIController.ShowUI();
+        public void HidePauseUI() => pauseUIController.HideUI();
+        public bool IsPauseUIActive() => pauseUIController != null && pauseUIController.IsActive();
+
         public void SetPar(int par) => gameplayUIController.SetPar(par);
         public void SetStrokes(int strokes) => gameplayUIController.SetStrokes(strokes);
         public void SetPower(int normalizedPower) => gameplayUIController.SetPower(normalizedPower);

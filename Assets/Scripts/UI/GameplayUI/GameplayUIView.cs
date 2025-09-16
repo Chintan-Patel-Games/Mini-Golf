@@ -26,7 +26,7 @@ namespace MiniGolf.UI.GameplayUI
 
         private void SubscribeToButtonClicks() => pauseButton.onClick.AddListener(controller.OnPauseButton);
         private void UnSubscribeFromButtonClicks() => pauseButton.onClick.RemoveListener(controller.OnPauseButton);
-        public void SetPar(int par) => parText.text = par.ToString();
+        public void SetPar(int par) => parText.text = "Par " + par;
         public void SetStrokes(int strokes) => strokesText.text = strokes.ToString();
         public void SetPower(float normalizedPower) => powerSlider.value = normalizedPower;
         private void OnDestroy() => UnSubscribeFromButtonClicks();
