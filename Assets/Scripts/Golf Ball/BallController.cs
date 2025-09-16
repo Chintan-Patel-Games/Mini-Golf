@@ -145,7 +145,7 @@ namespace MiniGolf.Ball
             CurrentPower = Mathf.RoundToInt((force / model.maxForce) * 100f);
             GameService.Instance.UIService.SetPower(CurrentPower);
 
-            view.LineRenderer.SetPosition(1, view.transform.InverseTransformPoint(endPos));
+            view.LineRenderer.SetPosition(1, view.transform.InverseTransformPoint(startPos - dragVector));
         }
 
         public void OnMouseUp()
