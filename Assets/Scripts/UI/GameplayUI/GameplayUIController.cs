@@ -18,9 +18,8 @@ namespace MiniGolf.UI.GameplayUI
 
         public void OnPauseButton()
         {
-            GameService.Instance.InputService.EnableBallInput(false);
-            GameService.Instance.InputService.EnableCameraInput(true);
-            GameService.Instance.UIService.ShowPauseUI();
+            GameService.Instance.SoundService.PlaySoundEffects(Sound.SoundType.UI_BUTTON_CLICK);
+            GameService.Instance.GameStateManager.ChangeState(GameState.GameState.Paused);
         }
 
         public void SetPar(int par) => ((GameplayUIView)view).SetPar(par);

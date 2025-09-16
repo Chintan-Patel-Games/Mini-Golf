@@ -17,11 +17,19 @@ namespace MiniGolf.UI.PauseUI
 
         public bool IsActive() => view.gameObject.activeSelf;
         
+        public void OnResumeButton()
+        {
+            view.HideUI();
+            GameService.Instance.SoundService.PlaySoundEffects(Sound.SoundType.UI_BUTTON_CLICK);
+            GameService.Instance.GameStateManager.ChangeState(GameState.GameState.PlayerInput);
+        }
+
         public void OnResetButton()
         {
             view.HideUI();
             GameService.Instance.InputService.EnableBallInput(true);
             GameService.Instance.InputService.EnableCameraInput(true);
+            GameService.Instance.SoundService.PlaySoundEffects(Sound.SoundType.UI_BUTTON_CLICK);
             GameService.Instance.GameStateManager.ResetLevel();
         }
 
@@ -30,6 +38,7 @@ namespace MiniGolf.UI.PauseUI
             view.HideUI();
             GameService.Instance.InputService.EnableBallInput(false);
             GameService.Instance.InputService.EnableCameraInput(false);
+            GameService.Instance.SoundService.PlaySoundEffects(Sound.SoundType.UI_BUTTON_CLICK);
             GameService.Instance.GameStateManager.Home();
         }
     }

@@ -66,7 +66,21 @@ namespace MiniGolf.Ball
             if (other.name == "Destroyer")
                 ResetBall();
             else if (other.name == "Hole")
-                GameService.Instance.GameStateManager.ChangeState(GameState.LevelComplete);
+                GameService.Instance.GameStateManager.ChangeState(GameState.GameState.LevelComplete);
+        }
+
+        public void OnCollisionEnter(Collision collision)
+        {
+            // Check if the ball hit the ground, wall, or obstacle
+            if (collision.gameObject.CompareTag("Level"))
+            {
+                float impactForce = collision.relativeVelocity.magnitude;
+
+                if (impactForce > 0.2f) // threshold to avoid tiny sounds
+                {
+                    GameService.Instance.SoundService.PlaySoundEffects(Sound.SoundType.BALL_HIT);
+                }
+            }
         }
 
         #region Update methods
@@ -80,7 +94,7 @@ namespace MiniGolf.Ball
                 view.Rb.angularVelocity = Vector3.zero;
                 view.AreaAffector.SetActive(true);
 
-                GameService.Instance.GameStateManager.ChangeState(GameState.PlayerInput);
+                GameService.Instance.GameStateManager.ChangeState(GameState.GameState.PlayerInput);
             }
         }
 
@@ -90,7 +104,7 @@ namespace MiniGolf.Ball
 
             canShoot = false;
             ballIsStatic = false;
-            GameService.Instance.GameStateManager.ChangeState(GameState.BallMoving);
+            GameService.Instance.GameStateManager.ChangeState(GameState.GameState.BallMoving);
 
             direction = startPos - endPos;
             view.Rb.AddForce(direction * force, ForceMode.Impulse);

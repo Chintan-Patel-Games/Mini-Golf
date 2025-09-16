@@ -39,6 +39,5 @@ namespace MiniGolf.InputSystem
 
         public void EnableBallInput(bool enabled) => model.EnableBallInput(enabled);
         public void EnableCameraInput(bool enabled) => model.EnableCameraInput(enabled);
-
     }
 }

@@ -23,7 +23,6 @@ namespace MiniGolf.InputSystem
             if (ballPosition == null) return;
 
             HandleMouseInput(ballPosition);
-            HandlePauseInput();
         }
 
         /// <summary>
@@ -52,31 +51,6 @@ namespace MiniGolf.InputSystem
                 controller.EndDrag();
                 if (controller.IsBallClick())
                     GameService.Instance.EventService.OnMouseUp.InvokeEvent();
-            }
-        }
-
-        /// <summary>
-        /// Handles Escape key for toggling pause.
-        /// </summary>
-        private void HandlePauseInput()
-        {
-            if (!Input.GetKeyDown(KeyCode.Escape)) return;
-
-            var uiService = GameService.Instance.UIService;
-
-            if (!uiService.IsPauseUIActive())
-            {
-                // Show pause overlay and block input
-                uiService.ShowPauseUI();
-                EnableBallInput(false);
-                EnableCameraInput(false);
-            }
-            else
-            {
-                // Hide pause overlay and resume input
-                uiService.HidePauseUI();
-                EnableBallInput(true);
-                EnableCameraInput(true);
             }
         }
 

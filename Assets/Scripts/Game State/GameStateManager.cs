@@ -1,93 +1,110 @@
 using MiniGolf.Main;
 using MiniGolf.UI;
 
-public class GameStateManager
+namespace MiniGolf.GameState
 {
-    public GameState CurrentState { get; private set; }
-
-    public void Initialize() => ChangeState(GameState.MainMenu);
-
-    public void ChangeState(GameState newState)
+    /// <summary>
+    /// Manages the overall game state and transitions between different states.
+    /// </summary>
+    public class GameStateManager
     {
-        CurrentState = newState;
+        public GameState CurrentState { get; private set; }
 
-        switch (newState)
+        public void Initialize() => ChangeState(GameState.MainMenu);
+
+        public void ChangeState(GameState newState)
         {
-            case GameState.MainMenu:
-                GameService.Instance.UIService.ShowUI(UIType.MainMenu);
-                break;
+            CurrentState = newState;
 
-            case GameState.LevelSetup:
-                GameService.Instance.UIService.ShowUI(UIType.Gameplay);
-                GameService.Instance.LevelService.StartLevel(() =>
-                {
-                    ChangeState(GameState.PlayerInput);
-                });
-                break;
+            switch (newState)
+            {
+                case GameState.MainMenu:
+                    GameService.Instance.UIService.ShowUI(UIType.MainMenu);
+                    break;
 
-            case GameState.PlayerInput:
-                // Enable input
-                GameService.Instance.InputService.EnableBallInput(true);
-                GameService.Instance.InputService.EnableCameraInput(true);
-                break;
+                case GameState.LevelSetup:
+                    GameService.Instance.UIService.ShowUI(UIType.Gameplay);
+                    GameService.Instance.SoundService.PlaySoundEffects(Sound.SoundType.LEVEL_START);
+                    GameService.Instance.LevelService.StartLevel(() =>
+                    {
+                        ChangeState(GameState.PlayerInput);
+                    });
+                    break;
 
-            case GameState.BallMoving:
-                // Disable input and start monitoring ball
-                GameService.Instance.InputService.EnableBallInput(false);
-                GameService.Instance.InputService.EnableCameraInput(true);
-                break;
+                case GameState.PlayerInput:
+                    // Enable input
+                    GameService.Instance.InputService.EnableBallInput(true);
+                    GameService.Instance.InputService.EnableCameraInput(true);
+                    GameService.Instance.UIService.HidePauseUI();
+                    break;
 
-            case GameState.LevelComplete:
-                // Show UI or transition to next level
-                GameService.Instance.InputService.EnableBallInput(false);
-                GameService.Instance.InputService.EnableCameraInput(false);
-                GameService.Instance.LevelService.CompleteLevel(() =>
-                {
-                    ChangeState(GameState.PlayerInput);
-                });
-                break;
+                case GameState.BallMoving:
+                    // Disable input and start monitoring ball
+                    GameService.Instance.InputService.EnableBallInput(false);
+                    GameService.Instance.InputService.EnableCameraInput(true);
+                    GameService.Instance.UIService.HidePauseUI();
+                    break;
+
+                case GameState.Paused:
+                    // Disable input and show pause UI
+                    GameService.Instance.InputService.EnableBallInput(false);
+                    GameService.Instance.InputService.EnableCameraInput(false);
+                    GameService.Instance.UIService.ShowPauseUI();
+                    break;
+
+                case GameState.LevelComplete:
+                    // Show UI or transition to next level
+                    GameService.Instance.InputService.EnableBallInput(false);
+                    GameService.Instance.InputService.EnableCameraInput(false);
+                    GameService.Instance.SoundService.PlaySoundEffects(Sound.SoundType.LEVEL_COMPLETE);
+                    GameService.Instance.LevelService.CompleteLevel(() =>
+                    {
+                        ChangeState(GameState.PlayerInput);
+                    });
+                    break;
+            }
         }
-    }
 
-    /// <summary>
-    /// Reset current level (retry).
-    /// Destroys ball, resets camera, plays fall animation, then reloads level.
-    /// </summary>
-    public void ResetLevel()
-    {
-        // Destroy ball if present
-        GameService.Instance.BallService.ClearBall();
-
-        // Play fall animation, then reload current level
-        GameService.Instance.LevelService.FallLevel(() =>
+        /// <summary>
+        /// Reset current level (retry).
+        /// Destroys ball, resets camera, plays fall animation, then reloads level.
+        /// </summary>
+        public void ResetLevel()
         {
-            // Reset camera
-            GameService.Instance.CameraManager.MoveVcamTo(() =>
+            // Destroy ball if present
+            GameService.Instance.BallService.ClearBall();
+
+            // Play fall animation, then reload current level
+            GameService.Instance.LevelService.FallLevel(() =>
             {
-                ChangeState(GameState.LevelSetup);
+                // Reset camera
+                GameService.Instance.CameraManager.MoveVcamTo(() =>
+                {
+                    ChangeState(GameState.LevelSetup);
+                });
             });
-        });
-    }
+        }
 
-    /// <summary>
-    /// Go back to main menu.
-    /// Clears everything, resets camera, shows Main Menu UI.
-    /// </summary>
-    public void Home()
-    {
-        // Destroy ball if present
-        GameService.Instance.BallService.ClearBall();
-
-
-        // Play fall animation, then reload current level
-        GameService.Instance.LevelService.FallLevel(() =>
+        /// <summary>
+        /// Go back to main menu.
+        /// Clears everything, resets camera, shows Main Menu UI.
+        /// </summary>
+        public void Home()
         {
-            // Reset camera, then show main menu
-            GameService.Instance.CameraManager.MoveVcamTo(() =>
+            // Destroy ball if present
+            GameService.Instance.BallService.ClearBall();
+
+
+            // Play fall animation, then reload current level
+            GameService.Instance.LevelService.FallLevel(() =>
             {
-                GameService.Instance.LevelService.DestroyLevel();
-                ChangeState(GameState.MainMenu);
+                // Reset camera, then show main menu
+                GameService.Instance.CameraManager.MoveVcamTo(() =>
+                {
+                    GameService.Instance.LevelService.DestroyLevel();
+                    ChangeState(GameState.MainMenu);
+                });
             });
-        });
+        }
     }
 }

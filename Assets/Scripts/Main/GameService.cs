@@ -1,7 +1,9 @@
 using MiniGolf.Ball;
 using MiniGolf.Event;
+using MiniGolf.GameState;
 using MiniGolf.InputSystem;
 using MiniGolf.Level;
+using MiniGolf.Sound;
 using MiniGolf.UI;
 using MiniGolf.Utilities;
 using UnityEngine;
@@ -11,7 +13,7 @@ namespace MiniGolf.Main
     public class GameService : GenericMonoSingleton<GameService>
     {
         // Services:
-        //public SoundService SoundService { get; private set; }
+        public SoundService SoundService { get; private set; }
         public GameStateManager GameStateManager { get; private set; }
         public EventService EventService { get; private set; }
         public LevelService LevelService { get; private set; }
@@ -25,11 +27,11 @@ namespace MiniGolf.Main
         [SerializeField] private UIService uiService;
         public UIService UIService => uiService;
 
-        //[SerializeField] private SoundSO soundSO;
+        [SerializeField] private SoundSO soundSO;
 
-        //[Header("AudioSource References")]
-        //[SerializeField] private AudioSource sfxSource;
-        //[SerializeField] private AudioSource bgMusicSource;
+        [Header("AudioSource References")]
+        [SerializeField] private AudioSource SFXSource;
+        [SerializeField] private AudioSource BGMSource;
 
         [Header("Level References")]
         [SerializeField] private LevelSO[] levelPrefabs;
@@ -49,7 +51,7 @@ namespace MiniGolf.Main
             BallService = new BallService(ballModel);
             GameStateManager = new GameStateManager();
             InputService = new InputService();
-            //SoundService = new SoundService(soundSO, sfxSource, bgMusicSource);
+            SoundService = new SoundService(soundSO, SFXSource, BGMSource);
         }
 
         private void Start() => GameStateManager.Initialize();
