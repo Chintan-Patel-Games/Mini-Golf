@@ -1,5 +1,6 @@
 using MiniGolf.Main;
 using MiniGolf.UI;
+using UnityEngine;
 
 namespace MiniGolf.GameState
 {
@@ -27,7 +28,10 @@ namespace MiniGolf.GameState
                     GameService.Instance.SoundService.PlaySoundEffects(Sound.SoundType.LEVEL_START);
                     GameService.Instance.LevelService.StartLevel(() =>
                     {
-                        ChangeState(GameState.PlayerInput);
+                        if (GameService.Instance.BallService.HasBall())
+                            ChangeState(GameState.PlayerInput);
+                        else
+                            Debug.LogError("Ball was not spawned correctly!");
                     });
                     break;
 

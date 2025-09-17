@@ -120,7 +120,7 @@ namespace MiniGolf.Ball
         {
             if (!ballIsStatic) return;
 
-            startPos = ClickedPoint();
+            startPos = view.transform.position;
             view.LineRenderer.gameObject.SetActive(true);
             view.LineRenderer.SetPosition(0, view.LineRenderer.transform.localPosition);
         }
@@ -154,14 +154,24 @@ namespace MiniGolf.Ball
 
             canShoot = true;
             view.LineRenderer.gameObject.SetActive(false);
+
+            // Reset UI
             GameService.Instance.UIService.SetPower(0);
             GameService.Instance.UIService.SetStrokes(++strokes);
         }
 
         private Vector3 ClickedPoint()
         {
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            return Physics.Raycast(ray, out var hit, Mathf.Infinity, model.rayLayer) ? hit.point : Vector3.zero;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            // Define a ground plane at y = 0
+            Plane groundPlane = new Plane(Vector3.up, view.transform.position);
+
+            if (groundPlane.Raycast(ray, out float distance))
+                return ray.GetPoint(distance);
+
+            // Fallback: return ball position
+            return view.transform.position;
         }
         #endregion
     }

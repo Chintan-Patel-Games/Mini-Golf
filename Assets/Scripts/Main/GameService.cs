@@ -47,8 +47,8 @@ namespace MiniGolf.Main
         {
             base.Awake();
             EventService = new EventService();
-            LevelService = new LevelService(levelPrefabs, levelParent);
             BallService = new BallService(ballModel);
+            LevelService = new LevelService(levelPrefabs, levelParent);
             GameStateManager = new GameStateManager();
             InputService = new InputService();
             SoundService = new SoundService(soundSO, SFXSource, BGMSource);
