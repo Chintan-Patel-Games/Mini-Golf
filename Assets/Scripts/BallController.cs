@@ -1,21 +1,140 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class BallController : MonoBehaviour
 {
-    public Rigidbody rb;
-    public float forceMultiplier = 10f;
+    public static BallController instance;
+    private Vector3 lastSafePosition;
+    private Quaternion lastSafeRotation;
 
-    void Start()
+    [SerializeField] private Transform startPosition;       // assign empty GameObject at start of level
+    [SerializeField] private LineRenderer lineRenderer;     //reference to lineRenderer child object
+    [SerializeField] private float MaxForce = 100f;         //maximum force that an be applied to ball
+    [SerializeField] private float dragSensitivity = 20f;    // how much drag translates to power
+    [SerializeField] private float forceModifier = 0.5f;    //multipliers of force
+    [SerializeField] private GameObject areaAffector;       //reference to sprite object which show area around ball to click
+    [SerializeField] private LayerMask rayLayer;            //layer allowed to be detected by ray
+
+    private float force;                                    //actuale force which is applied to the ball
+    private Rigidbody rgBody;                               //reference to rigidbody attached to this gameobject
+    private Vector3 startPos, endPos;
+    private bool canShoot = false, ballIsStatic = true;     //bool to make shooting stopping ball easy
+    private Vector3 direction;                              //direction in which the ball will be shot
+
+    public int CurrentPower { get; private set; }
+
+    private void Awake()
     {
-        if (rb == null) rb = GetComponent<Rigidbody>();
+        if (instance == null) instance = this;
+        else Destroy(gameObject);
+
+        rgBody = GetComponent<Rigidbody>();
+    }
+
+    private void Start()
+    {
+        // Set initial safe position
+        lastSafePosition = startPosition.position;
+        lastSafeRotation = startPosition.rotation;
+
+        // Optional: move ball to start
+        transform.position = lastSafePosition;
+        transform.rotation = lastSafeRotation;
     }
 
     void Update()
     {
-        // Test: press Space to push ball forward
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (rgBody.velocity == Vector3.zero && !ballIsStatic)   //if velocity is zero and ballIsStatic is false
         {
-            rb.AddForce(Vector3.forward * forceMultiplier, ForceMode.Impulse);
+            ballIsStatic = true;
+            lastSafePosition = transform.position;
+            lastSafeRotation = transform.rotation;                            //set ballIsStatic to true
+            //LevelManager.instance.ShotTaken();                  //inform LevelManager of shot taken
+            rgBody.angularVelocity = Vector3.zero;              //set angular velocity to zero
+            areaAffector.SetActive(true);                       //activate areaAffector
         }
     }
+
+    private void FixedUpdate()
+    {
+        if (canShoot)                                               //if canSHoot is true
+        {
+            canShoot = false;                                       //set canShoot to false
+            ballIsStatic = false;                                   //set ballIsStatic to false
+            direction = startPos - endPos;                          //get the direction between 2 vectors from start to end pos
+            rgBody.AddForce(direction * force, ForceMode.Impulse);  //add force to the ball in given direction
+            areaAffector.SetActive(false);                          //deactivate areaAffector
+            //UIManager.instance.PowerBar.fillAmount = 0;             //reset the powerBar to zero
+            force = 0;                                              //reset the force to zero
+            startPos = endPos = Vector3.zero;                       //reset the vectors to zero
+        }
+    }
+
+    // Unity native Method to detect colliding objects
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "Destroyer")                              //if the object name is Destroyer
+        {
+            ResetBall();
+            //LevelManager.instance.LevelFailed();                    //Level Failed
+        }
+        else if (other.name == "Hole")                              //if the object name is Hole
+        {
+            Debug.Log("Level Completed");
+            //LevelManager.instance.LevelComplete();                  //Level Complete
+        }
+    }
+
+    public void MouseDownMethod()                                           //method called on mouse down by InputManager
+    {
+        if (!ballIsStatic) return;                                           //no mouse detection if ball is moving
+        startPos = ClickedPoint();                                          //get the vector in word space
+        lineRenderer.gameObject.SetActive(true);                            //activate lineRenderer
+        lineRenderer.SetPosition(0, lineRenderer.transform.localPosition);  //set its 1st position
+    }
+
+    public void MouseNormalMethod()                                         //method called by InputManager
+    {
+        if (!ballIsStatic) return;                                           //no mouse detection if ball is moving
+        endPos = ClickedPoint();
+        float dragDistance = Vector3.Distance(endPos, startPos);            // Calculate raw drag distance
+        force = Mathf.Clamp(dragDistance * dragSensitivity, 0, MaxForce);   //calculate the force
+        CurrentPower = Mathf.RoundToInt((force / MaxForce) * 100f);          // Convert to 0–100 scale
+        //UIManager.instance.PowerBar.fillAmount = force / MaxForce;              //set the powerBar image fill amount
+        //we convert the endPos to local pos for ball as lineRenderer is child of ball
+        lineRenderer.SetPosition(1, transform.InverseTransformPoint(endPos));   //set its 1st position
+    }
+
+    public void MouseUpMethod()                                             //method called by InputManager
+    {
+        if (!ballIsStatic) return;                                           //no mouse detection if ball is moving
+        canShoot = true;                                                    //set canShoot true
+        lineRenderer.gameObject.SetActive(false);                           //deactive lineRenderer
+    }
+
+    private Vector3 ClickedPoint()
+    {
+        Vector3 position = Vector3.zero;                                //get a new Vector3 varialbe
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);    //create a ray from camera in mouseposition direction
+        RaycastHit hit = new RaycastHit();                              //create a RaycastHit
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, rayLayer))    //check for the hit
+            position = hit.point;                                       //save the hit point in position
+        return position;                                                //return position
+    }
+
+    private void ResetBall()
+    {
+        rgBody.velocity = Vector3.zero;
+        rgBody.angularVelocity = Vector3.zero;
+        transform.position = lastSafePosition;
+        transform.rotation = lastSafeRotation;
+    }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 1.5f);
+    }
+#endif
 }
