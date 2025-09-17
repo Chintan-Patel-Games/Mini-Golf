@@ -66,7 +66,21 @@ namespace MiniGolf.Ball
             if (other.name == "Destroyer")
                 ResetBall();
             else if (other.name == "Hole")
-                GameService.Instance.GameStateManager.ChangeState(GameState.LevelComplete);
+                GameService.Instance.GameStateManager.ChangeState(GameState.GameState.LevelComplete);
+        }
+
+        public void OnCollisionEnter(Collision collision)
+        {
+            // Check if the ball hit the ground, wall, or obstacle
+            if (collision.gameObject.CompareTag("Level"))
+            {
+                float impactForce = collision.relativeVelocity.magnitude;
+
+                if (impactForce > 0.2f) // threshold to avoid tiny sounds
+                {
+                    GameService.Instance.SoundService.PlaySoundEffects(Sound.SoundType.BALL_HIT);
+                }
+            }
         }
 
         #region Update methods
@@ -80,7 +94,7 @@ namespace MiniGolf.Ball
                 view.Rb.angularVelocity = Vector3.zero;
                 view.AreaAffector.SetActive(true);
 
-                GameService.Instance.GameStateManager.ChangeState(GameState.PlayerInput);
+                GameService.Instance.GameStateManager.ChangeState(GameState.GameState.PlayerInput);
             }
         }
 
@@ -90,7 +104,7 @@ namespace MiniGolf.Ball
 
             canShoot = false;
             ballIsStatic = false;
-            GameService.Instance.GameStateManager.ChangeState(GameState.BallMoving);
+            GameService.Instance.GameStateManager.ChangeState(GameState.GameState.BallMoving);
 
             direction = startPos - endPos;
             view.Rb.AddForce(direction * force, ForceMode.Impulse);
@@ -106,7 +120,7 @@ namespace MiniGolf.Ball
         {
             if (!ballIsStatic) return;
 
-            startPos = ClickedPoint();
+            startPos = view.transform.position;
             view.LineRenderer.gameObject.SetActive(true);
             view.LineRenderer.SetPosition(0, view.LineRenderer.transform.localPosition);
         }
@@ -131,7 +145,7 @@ namespace MiniGolf.Ball
             CurrentPower = Mathf.RoundToInt((force / model.maxForce) * 100f);
             GameService.Instance.UIService.SetPower(CurrentPower);
 
-            view.LineRenderer.SetPosition(1, view.transform.InverseTransformPoint(endPos));
+            view.LineRenderer.SetPosition(1, view.transform.InverseTransformPoint(startPos - dragVector));
         }
 
         public void OnMouseUp()
@@ -140,14 +154,24 @@ namespace MiniGolf.Ball
 
             canShoot = true;
             view.LineRenderer.gameObject.SetActive(false);
+
+            // Reset UI
             GameService.Instance.UIService.SetPower(0);
             GameService.Instance.UIService.SetStrokes(++strokes);
         }
 
         private Vector3 ClickedPoint()
         {
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            return Physics.Raycast(ray, out var hit, Mathf.Infinity, model.rayLayer) ? hit.point : Vector3.zero;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            // Define a ground plane at y = 0
+            Plane groundPlane = new Plane(Vector3.up, view.transform.position);
+
+            if (groundPlane.Raycast(ray, out float distance))
+                return ray.GetPoint(distance);
+
+            // Fallback: return ball position
+            return view.transform.position;
         }
         #endregion
     }

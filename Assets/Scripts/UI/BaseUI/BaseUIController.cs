@@ -9,7 +9,7 @@ namespace MiniGolf.UI.BaseUI
         protected BaseUIView view;
 
         public BaseUIController(BaseUIView viewToSet) => view = viewToSet;
-        public void ShowUI() => view.ShowUI();
-        public void HideUI() => view.HideUI();
+        public virtual void ShowUI() => view.ShowUI();
+        public virtual void HideUI() => view.HideUI();
     }
 }

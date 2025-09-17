@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MiniGolf.Level
 {
-    [CreateAssetMenu(fileName = "LevelData", menuName = "MiniGolf/LevelData")]
+    [CreateAssetMenu(fileName = "LevelSO", menuName = "ScriptableObjects/LevelSO")]
     public class LevelSO : ScriptableObject
     {
         [Header("Level Settings")]

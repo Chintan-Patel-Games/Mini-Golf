@@ -10,6 +10,7 @@ namespace MiniGolf.UI.PauseUI
     /// </summary>
     public class PauseUIView : BaseUIView
     {
+        [SerializeField] private Button resumeButton;
         [SerializeField] private Button retryButton;
         [SerializeField] private Button homeButton;
 
@@ -23,12 +24,14 @@ namespace MiniGolf.UI.PauseUI
 
         private void SubscribeToButtonClicks()
         {
+            resumeButton.onClick.AddListener(controller.OnResumeButton);
             retryButton.onClick.AddListener(controller.OnResetButton);
             homeButton.onClick.AddListener(controller.OnHomeButton);
         }
 
         private void UnSubscribeFromButtonClicks()
         {
+            resumeButton.onClick.RemoveListener(controller.OnResumeButton);
             retryButton.onClick.RemoveListener(controller.OnResetButton);
             homeButton.onClick.RemoveListener(controller.OnHomeButton);
         }

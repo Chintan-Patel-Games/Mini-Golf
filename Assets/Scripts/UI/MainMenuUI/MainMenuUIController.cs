@@ -10,7 +10,16 @@ namespace MiniGolf.UI.MainMenuUI
     public class MainMenuUIController : BaseUIController
     {
         public MainMenuUIController(MainMenuUIView view) : base(view) => view.SetController(this);
-        public void OnStartButton() => GameService.Instance.GameStateManager.ChangeState(GameState.LevelSetup);
-        public void OnQuitButton() => GameService.Instance.OnExitGame();
+        public void OnStartButton()
+        {
+            GameService.Instance.SoundService.PlaySoundEffects(Sound.SoundType.UI_BUTTON_CLICK);
+            GameService.Instance.GameStateManager.ChangeState(GameState.GameState.LevelSetup);
+        }
+
+        public void OnQuitButton()
+        {
+            GameService.Instance.SoundService.PlaySoundEffects(Sound.SoundType.UI_BUTTON_CLICK);
+            GameService.Instance.OnExitGame();
+        }
     }
 }

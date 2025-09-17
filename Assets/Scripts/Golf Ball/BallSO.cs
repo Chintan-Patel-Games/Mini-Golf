@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MiniGolf.Ball
 {
-    [CreateAssetMenu(fileName = "BallModel", menuName = "MiniGolf/Ball/BallModel")]
+    [CreateAssetMenu(fileName = "BallSO", menuName = "ScriptableObjects/BallSO")]
     public class BallSO : ScriptableObject
     {
         [Header("Physics Settings")]

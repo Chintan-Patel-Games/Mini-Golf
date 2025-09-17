@@ -45,9 +45,23 @@ namespace MiniGolf.Level
         {
             var start = view.StartPoint;
 
+            if (start == null)
+            {
+                Debug.LogError("LevelView.StartPoint is missing!");
+                onComplete?.Invoke();
+                return;
+            }
+
             // Delegate to BallService
             GameService.Instance.BallService.SpawnBall(start.position, start.rotation, ballController =>
             {
+                if (ballController?.View == null)
+                {
+                    Debug.LogError("BallController or View is null!");
+                    onComplete?.Invoke();
+                    return;
+                }
+
                 // Camera follows ball
                 GameService.Instance.CameraManager.SetTarget(ballController.View.transform, true, true);
 

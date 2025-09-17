@@ -20,6 +20,7 @@ namespace MiniGolf.Ball
 
         private void Awake() => rb = GetComponent<Rigidbody>();
         private void OnTriggerEnter(Collider other) => controller?.OnTriggerEnter(other);
+        private void OnCollisionEnter(Collision collision) => controller?.OnCollisionEnter(collision);
         public void SetController(BallController controllerToSet) => controller = controllerToSet;
     }
 }
